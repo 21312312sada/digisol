@@ -1,121 +1,132 @@
+:root{
+    --bg-1: #0f1724;
+    --bg-2: #102a43;
+    --card: rgba(255,255,255,0.04);
+    --tile-empty: #ffffff;
+    --tile-absent: #787c7e;
+    --tile-present: #c9b458;
+    --tile-correct: #6aaa64;
+    --accent: #7c5cff;
+    --glass: rgba(255,255,255,0.06);
+}
+
+*{box-sizing: border-box}
+
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
 body{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    background: linear-gradient(180deg,var(--bg-1) 0%, var(--bg-2) 100%);
+    background-attachment: scroll;
+    color: #e6eef8;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    padding: max(12px, env(safe-area-inset-top)) 16px 32px;
+    min-height: 100vh;
+}
+
+/* Game wrapper (if present) */
+/* main game container */
+#game, .game {
+    width: min(720px, 96vw);
+    margin: 12px auto 40px; /* small top margin to keep title visible */
     text-align: center;
-    font-size: 40px;
-
 }
 
-#info-link {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    z-index: 10;
+h1{font-size:clamp(20px,3.6vw,36px);margin:6px 0 18px}
+
+/* Controls & header */
+#info-link, #back-link{position:absolute; top:18px; left:18px; z-index:20}
+#info-button, #back-button{
+    font-size:14px;
+    padding:8px 12px;
+    background: linear-gradient(180deg,var(--glass), rgba(255,255,255,0.02));
+    color: #e6eef8;
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:10px;
+    cursor:pointer;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.4);
 }
 
-#info-button {
-    font-size: 24px;
-    padding: 5px 10px;
-    background-color: #f0f0f0;
-    border: 2px solid #000;
-    border-radius: 5px;
-    cursor: pointer;
-}
+/* Site header */
+.site-header{ width:100%; background:transparent; display:flex; justify-content:center; padding:12px 0; position:sticky; top:0; z-index:30 }
+.site-header .header-inner{ width:min(1100px,96%); display:flex; justify-content:space-between; align-items:center }
+.site-header .brand{ color:#fff; font-weight:700; font-size:20px; text-decoration:none }
+.site-nav a{ color:rgba(230,238,248,0.9); margin-left:18px; text-decoration:none; padding:8px 10px; border-radius:8px }
+.site-nav a:hover{ background: rgba(255,255,255,0.03) }
 
+/* Input tiles (Wordle squares) */
 input{
-    width: 70px;
-    height: 70px;
-    background-color: white;
-    border-color: black;
-    border: 3px solid black;
-    margin: 5px;
-    font: 50px Arial, sans-serif;
+    -webkit-appearance:none;
+    -moz-appearance:none;
+    appearance:none;
+    /* smaller, consistent tile size similar to Wordle */
+    width: clamp(44px, 9vw, 64px);
+    height: clamp(44px, 9vw, 64px);
+    margin: 4px;
+    background: var(--tile-empty);
+    border: 2px solid rgba(0,0,0,0.18);
+    border-radius: 6px;
+    font-weight:700;
+    font-size: clamp(20px, 3.6vw, 28px);
     text-align: center;
+    color: #0b1220;
+    text-transform: uppercase;
+    transition: transform 150ms ease, background-color 220ms ease, box-shadow 150ms ease;
+    box-shadow: 0 6px 14px rgba(2,6,23,0.35), inset 0 -1px 0 rgba(255,255,255,0.02);
+    caret-color: transparent;
 }
+
+input:focus{outline:none; transform: translateY(-4px) scale(1.02); box-shadow: 0 12px 30px rgba(2,6,23,0.6);}
+
+/* tile reveal animations */
+@keyframes flipIn {
+    0%{ transform: rotateX(0deg) }
+    50%{ transform: rotateX(-90deg) }
+    100%{ transform: rotateX(0deg) }
+}
+
+.reveal{animation: flipIn 600ms ease forwards; transform-origin: center bottom;}
+
+/* state styles */
+.state-absent{ background: var(--tile-absent); color: #fff; border-color: var(--tile-absent); box-shadow: none}
+.state-present{ background: var(--tile-present); color: #fff; border-color: var(--tile-present); box-shadow: none}
+.state-correct{ background: var(--tile-correct); color: #fff; border-color: var(--tile-correct); box-shadow: none}
+
+/* compact rows - if using container rows */
+.row{display:flex;justify-content:center;margin:4px 0; gap:6px}
+
+/* optional .board grid: if your markup uses a single board container, this will center and fix width */
+.board{ display:grid; grid-template-columns: repeat(5, minmax(44px, 64px)); gap:8px; justify-content:center; margin:8px auto }
+
+/* make the game area tighter and more Wordle-like */
+#game, .game { max-width: 420px; }
 
 /* popup card/overlay styles */
-.popup-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0,0,0,0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-.popup-card {
-  background: #fff;
-  padding: 20px;
-  border-radius: 8px;
-  text-align: center;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-}
-
-.popup-card button {
-  margin-top: 10px;
-  padding: 5px 10px;
-  font-size: 16px;
-}
+.popup-overlay{ position:fixed; inset:0; background: linear-gradient(180deg, rgba(2,6,23,0.6), rgba(2,6,23,0.8)); display:flex; align-items:center; justify-content:center; z-index:1000}
+.popup-card{ width:min(720px,92vw); background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); padding:20px 24px; border-radius:12px; box-shadow: 0 12px 40px rgba(2,6,23,0.6); color:#e6eef8}
+.popup-card h2{ margin:0 0 8px }
+.popup-card p{ margin:6px 0 }
+.popup-card button{ margin-top:14px; padding:10px 14px; border-radius:10px; border:none; background:var(--accent); color:#fff; cursor:pointer }
 
 /* Information page styles */
-#back-link {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    z-index: 10;
+#info-container{ max-width:900px; margin: 0 auto; padding: 26px; text-align:left; color:#e6eef8 }
+#info-content{ margin-top:60px }
+#info-content h1{ text-align:center; font-size: clamp(22px, 3.4vw, 40px); margin-bottom:18px }
+#info-content h2{ font-size:20px; margin-top:20px }
+#info-content p, #info-content li{ color: #cfe6ff; line-height:1.6 }
+
+/* Responsiveness tweaks */
+@media (max-width:520px){
+    input{ margin:4px; border-radius:6px }
+    #info-button, #back-button{ padding:6px 10px }
 }
 
-#back-button {
-    font-size: 24px;
-    padding: 5px 10px;
-    background-color: #f0f0f0;
-    border: 2px solid #000;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-#info-container {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
-    text-align: left;
-    font-size: 18px;
-    line-height: 1.6;
-}
-
-#info-content {
-    margin-top: 60px; /* Space for the back button */
-}
-
-#info-content h1 {
-    text-align: center;
-    font-size: 36px;
-    margin-bottom: 30px;
-}
-
-#info-content h2 {
-    font-size: 28px;
-    margin-top: 30px;
-    margin-bottom: 15px;
-}
-
-#info-content h3 {
-    font-size: 24px;
-    margin-top: 25px;
-    margin-bottom: 10px;
-}
-
-#info-content p {
-    margin-bottom: 15px;
-}
-
-#info-content ul {
-    margin-bottom: 20px;
-    padding-left: 30px;
-}
-
-#info-content li {
-    margin-bottom: 8px;
-}
+/* small utility */
+.muted{ opacity:0.75; font-size:14px }
